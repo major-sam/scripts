@@ -1,4 +1,12 @@
-﻿$archiveFolder = "c:\Archive"
+﻿<#
+Скрипт для создания бэкапов окружения и баз данных перед накаткой изменений
+
+подразуемевается что делаться будет не более 1 раза в  сутки если чаще - то стоит изменить формат даты $currentDate  (dd-MM-yy-HH-mm-ss)
+
+Список сервисова $bakFolders  лучше использовать в зависимости от окружения, но сейчас добавлен скип для несуществующих папок.В дальнейшем должно переехать в переменную окружения
+#>
+
+$archiveFolder = "c:\Archive"
 $bakFolders = ("c:\inetpub", "c:\kernel", "c:\kernelweb", "c:\Services")
 $currentDate = Get-Date -Format "dd-MM-yy"
 $currentArchive = Join-Path -Path  $archiveFolder -ChildPath $currentDate
