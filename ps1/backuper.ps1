@@ -83,5 +83,5 @@ Compress-Archive -Path $currentArchive -DestinationPath $currentArchive".zip"
 throw "$env:ProgramFiles\7-Zip\7z.exe needed"}
 else{
 set-alias arch "$env:ProgramFiles\7-Zip\7z.exe"
-sz a -tzip $currentArchive   $currentArchive }
+arch a -tzip $currentArchive   $currentArchive }
 Remove-Item -Force -Recurse $currentArchive 
