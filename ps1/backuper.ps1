@@ -7,9 +7,18 @@
 #>
 
 $archiveFolder = "c:\Archive"
+#папка для архивов.  В дальнейшем надо унести в сеть
 $bakFolders = ("c:\inetpub", "c:\kernel", "c:\kernelweb", "c:\Services")
-$currentDate = Get-Date -Format "dd-MM-yy"
+#список папок сервисов для бэкапов
+$excludeDB = "'master','model','msdb','tempdb'"
+# исключить базы из  бэкапа "'master','model','msdb','tempdb'"  внешние ковыки обязательны - передается строка
+$currentDate = Get-Date -Format "dd-MM-yy hh-mm"
+# формат имени бэкапов - используется дата время
 $currentArchive = Join-Path -Path  $archiveFolder -ChildPath $currentDate
+# join пути к папке
+$queryTimeout = 720
+#максимальное время ожидания выполнения бэкапа в секундах
+
 If(!(test-path $archiveFolder))
 {
       New-Item -ItemType Directory -Force -Path $archiveFolder
@@ -45,7 +54,7 @@ SELECT @fileDate = CONVERT(VARCHAR(20),GETDATE(),112)
 DECLARE db_cursor CURSOR READ_ONLY FOR  
 SELECT name 
 FROM master.sys.databases 
-WHERE name NOT IN ('master','model','msdb','tempdb')  -- exclude these databases
+WHERE name NOT IN ($excludeDB)  -- exclude these databases
 AND state = 0 -- database is online
 AND is_in_standby = 0 -- database is not read only for log shipping
  
@@ -66,7 +75,7 @@ DEALLOCATE db_cursor
 "
 
 
-Invoke-Sqlcmd -QueryTimeout 720 -verbose -ServerInstance $env:COMPUTERNAME -Database "master" -query $backupQuery -ErrorAction Stop
+Invoke-Sqlcmd -QueryTimeout $queryTimeout -verbose -ServerInstance $env:COMPUTERNAME -Database "master" -query $backupQuery -ErrorAction Stop
 
 
 if (-not (test-path "$env:ProgramFiles\7-Zip\7z.exe")) {
