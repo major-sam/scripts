@@ -41,7 +41,45 @@ $IISPools - переменная для создания пулов и сайт�
 пока не реализованы:
 sslFlags 
 Подстановка сертификатов
+	Вариант с запуском с аргументами и генережкой сертификатов с Microsoft SDK
+	>.\SSLIISBinding.ps1 "test.west-wind.com" "Default Web Site" "LocalMachine" $cert
+	
+	$hostname = "test.west-wind.com"
+	$iisSite = "Default Web Site"
+	$machine = "LocalMachine"
 
+	if ($args[0]) 
+	{     
+		$hostname = $args[0]
+	}
+	if($args[1])
+	{
+		$iisSite = $args[1]
+	}
+	if ($args[2])
+	{
+		$machine = $args[2]
+	}
+	if ($args[3])
+	{
+		$cert = $args[3]
+	}
+	"Host Name: " + $hostname
+	"Site Name: " + $iisSite
+	"  Machine: " + $machine
+	if (-not $cert) {
+		# Create a certificate
+		& "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\x64\makecert" -r -pe -n "CN=${hostname}" -b 06/01/2016 -e 06/01/2020 -eku 1.3.6.1.5.5.7.3.1 -ss my -sr localMachine  -sky exchange  -sp "Microsoft RSA SChannel Cryptographic Provider" -sy 12
+
+		dir cert:\localmachine\my
+		$cert = (Get-ChildItem cert:\LocalMachine\My | where-object { $_.Subject -like "*$hostname*" } | Select-Object -First 1).Thumbprint
+		$cert
+	}
+	"Cert Hash: " + $cert
+
+	# http.sys mapping of ip/hostheader to cert
+	$guid = [guid]::NewGuid().ToString("B")
+	netsh http add sslcert hostnameport="${hostname}:443" certhash=$cert certstorename=MY appid="$guid"
 #>
 ## Disable firewall 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
@@ -209,8 +247,6 @@ New-Item "C:\Temp" -ItemType "Directory" -Force
 Remove-Item $errorOutputFile -Force
 Remove-Item $standardOutputFile -Force
 Copy-Item $pathToConfigurationFile $copyFileLocation -Force
-
-Write-Host "Getting the name of the current user to replace in the copy ini file."
 # legacy mssql server statement
 #$user = "$env:UserDomain\$env:USERNAME"
 
@@ -250,33 +286,41 @@ Dismount-DiskImage -InputObject $drive
 
 Remove-Item "c:\temp" -Recurse -force
 
-Write-Host "If no red text then SQL Server Successfully Installed!"
 
 
-##ssms
-# Set file and folder path for SSMS installer .exe
-$folderpath="c:\windows\temp"
-$filepath="$folderpath\SSMS-Setup-ENU.exe"
- 
-#If SSMS not present, download
-if (!(Test-Path $filepath)){
-write-host "Downloading SQL Server 2016 SSMS..."
-$URL = "https://aka.ms/ssmsfullsetup"
-$clnt = New-Object System.Net.WebClient
-$clnt.DownloadFile($url,$filepath)
-Write-Host "SSMS installer download complete" -ForegroundColor Green
- 
-}
-else {
- 
-write-host "Located the SQL SSMS Installer binaries, moving on to install..."
-}
- 
-# start the SSMS installer
-write-host "Beginning SSMS 2016 install..." -nonewline
-$Parms = " /Install /Quiet /Norestart /Logs log.txt"
-$Prms = $Parms.Split(" ")
-& "$filepath" $Prms | Out-Null
-Write-Host "SSMS installation complete" -ForegroundColor Green
 
-remove-item $filepath
+#CHOCOLATEY
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+# renew env:PATH
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+choco install -y notepadplusplus googlechrome ssms
+choco install -y redis rabbitmq dotnetcore-3.0-runtime dotnet-5.0-aspnetruntime --version=5.0.6 dotnet-runtime --version=5.0.6 dotnetcore-aspnetruntime --version=3.0.3 dotnet-5.0-desktopruntime --version=5.0.8 dotnet-runtime --version=5.0.8 dotnetcore-runtime.install --version=3.1.17 dotnetcore --version=5.0.6
+
+
+#ssms http download (legacy)
+##Set file and folder path for SSMS installer .exe
+# $folderpath="c:\windows\temp"
+# $filepath="$folderpath\SSMS-Setup-ENU.exe"
+ 
+##If SSMS not present, download
+# if (!(Test-Path $filepath)){
+# write-host "Downloading SQL Server 2016 SSMS..."
+# $URL = "https://aka.ms/ssmsfullsetup"
+# $clnt = New-Object System.Net.WebClient
+# $clnt.DownloadFile($url,$filepath)
+# Write-Host "SSMS installer download complete" -ForegroundColor Green
+ 
+# }
+# else {
+ 
+# write-host "Located the SQL SSMS Installer binaries, moving on to install..."
+# }
+ 
+## start the SSMS installer
+# write-host "Beginning SSMS 2016 install..." -nonewline
+# $Parms = " /Install /Quiet /Norestart /Logs log.txt"
+# $Prms = $Parms.Split(" ")
+# & "$filepath" $Prms | Out-Null
+# Write-Host "SSMS installation complete" -ForegroundColor Green
+
+# remove-item $filepath
