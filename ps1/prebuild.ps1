@@ -11,13 +11,9 @@ prerequsites:
 	
 	
 	Дженкинс
-	!java 11
 	!jenkins node registration
 	
 	
-	Дополнительно
-	~npp++
-	~chrome
 	
 	
 	
