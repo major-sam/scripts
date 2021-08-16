@@ -285,13 +285,15 @@ Remove-Item "c:\temp" -Recurse -force
 
 
 
-#CHOCOLATEY
+#CHOCOLATEY install
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 # renew env:PATH
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
-choco install -y notepadplusplus googlechrome ssms git
-choco install -y redis rabbitmq dotnetcore-3.0-runtime dotnet-5.0-aspnetruntime --version=5.0.6 dotnet-runtime --version=5.0.6 dotnetcore-aspnetruntime --version=3.0.3 dotnet-5.0-desktopruntime --version=5.0.8 dotnet-runtime --version=5.0.8 dotnetcore-runtime.install --version=3.1.17 dotnetcore --version=5.0.6
+choco install -y notepadplusplus googlechrome ssms git 
+choco install -y redis rabbitmq dotnetcore-3.0-runtime dotnet-5.0-aspnetruntime --version=5.0.6 dotnet-runtime --version=5.0.6 dotnetcore-aspnetruntime --version=3.0.3 dotnet-5.0-desktopruntime --version=5.0.8 dotnet-runtime --version=5.0.8 dotnetcore-runtime.install --version=3.1.17 dotnetcore --version=5.0.6 visualstudio2019buildtools
 
+## for build nodes
+choco install -y  visualstudio2019buildtools
 
 #ssms http download (legacy)
 ##Set file and folder path for SSMS installer .exe
