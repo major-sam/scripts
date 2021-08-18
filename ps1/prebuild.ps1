@@ -34,6 +34,8 @@ $IISPools - переменная для создания пулов и сайт�
 
 :TODO 
 
+Часть iis скрипта необходимо вынести в деплой приложения
+
 пока не реализованы:
 sslFlags 
 Подстановка сертификатов
@@ -289,36 +291,29 @@ Remove-Item "c:\temp" -Recurse -force
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 # renew env:PATH
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
-choco install -y notepadplusplus googlechrome ssms git 
-choco install -y redis rabbitmq dotnetcore-3.0-runtime dotnet-5.0-aspnetruntime --version=5.0.6 dotnet-runtime --version=5.0.6 dotnetcore-aspnetruntime --version=3.0.3 dotnet-5.0-desktopruntime --version=5.0.8 dotnet-runtime --version=5.0.8 dotnetcore-runtime.install --version=3.1.17 dotnetcore --version=5.0.6 visualstudio2019buildtools
-
-## for build nodes
-choco install -y  visualstudio2019buildtools
-
-#ssms http download (legacy)
-##Set file and folder path for SSMS installer .exe
-# $folderpath="c:\windows\temp"
-# $filepath="$folderpath\SSMS-Setup-ENU.exe"
- 
-##If SSMS not present, download
-# if (!(Test-Path $filepath)){
-# write-host "Downloading SQL Server 2016 SSMS..."
-# $URL = "https://aka.ms/ssmsfullsetup"
-# $clnt = New-Object System.Net.WebClient
-# $clnt.DownloadFile($url,$filepath)
-# Write-Host "SSMS installer download complete" -ForegroundColor Green
- 
-# }
-# else {
- 
-# write-host "Located the SQL SSMS Installer binaries, moving on to install..."
-# }
- 
-## start the SSMS installer
-# write-host "Beginning SSMS 2016 install..." -nonewline
-# $Parms = " /Install /Quiet /Norestart /Logs log.txt"
-# $Prms = $Parms.Split(" ")
-# & "$filepath" $Prms | Out-Null
-# Write-Host "SSMS installation complete" -ForegroundColor Green
-
-# remove-item $filepath
+choco install -y notepadplusplus  `
+	googlechrome  `
+	ssms `
+	git `
+	nuget.commandline `
+	dotnet-sdk `
+	redis `
+	rabbitmq `
+	dotnetcore-3.0-runtime `
+	dotnet-5.0-aspnetruntime --version=5.0.6 `
+	dotnet-runtime	--version=5.0.6 `
+	dotnetcore-aspnetruntime --version=3.0.3 `
+	dotnet-5.0-desktopruntime --version=5.0.8 `
+	dotnet-runtime	--version=5.0.8 `
+	dotnetcore-runtime.install --version=3.1.17 `
+	dotnetcore	--version=5.0.6 `
+	visualstudio2019buildtools  `
+	visualstudio2019-workload-netcorebuildtools `
+	visualstudio2019-workload-visualstudioextensionbuildtools `
+	visualstudio2019-workload-databuildtools  `
+	visualstudio2019-workload-nodebuildtools `
+	visualstudio2019-workload-universalbuildtools `
+	visualstudio2019-workload-webbuildtools `
+	nodejs `
+	python2
+npm install --global windows-build-tools
