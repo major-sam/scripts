@@ -315,5 +315,6 @@ choco install -y notepadplusplus  `
 	visualstudio2019-workload-universalbuildtools `
 	visualstudio2019-workload-webbuildtools `
 	nodejs `
+	python `
 	python2
 npm install --global windows-build-tools
