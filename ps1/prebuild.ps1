@@ -83,6 +83,8 @@ sslFlags
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 ## Disable Wdefender
 Set-MpPreference -DisableRealtimeMonitoring $true 
+## Allow long path
+Set-ItemProperty 'HKLM:\System\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -value 1
 # iis
 
 [Net.ServicePointManager]::SecurityProtocol = "tls12"
