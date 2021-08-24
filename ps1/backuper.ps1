@@ -21,17 +21,17 @@ $queryTimeout = 720
 
 If(!(test-path $archiveFolder))
 {
-      New-Item -ItemType Directory -Force -Path $archiveFolder
+      New-Item -ItemType Directory -Force -Path $archiveFolder -Verbose
 }
 
 If(!(test-path $currentArchive))
 {
-      New-Item -ItemType Directory -Force -Path $currentArchive
+      New-Item -ItemType Directory -Force -Path $currentArchive -Verbose
 }
 
 foreach ($folder in $bakFolders ){
     if (test-path $folder){
-        Copy-Item -Path $folder -Destination $currentArchive -Force -Recurse
+        Copy-Item -Path $folder -Destination $currentArchive -Force -Recurse -Verbose
     }
     else{
         write-host  -ForegroundColor Yellow "$folder not exists. Skipped"   
@@ -79,7 +79,7 @@ Invoke-Sqlcmd -QueryTimeout $queryTimeout -verbose -ServerInstance $env:COMPUTER
 
 
 if (-not (test-path "$env:ProgramFiles\7-Zip\7z.exe")) {
-Compress-Archive -Path $currentArchive -DestinationPath $currentArchive".zip"
+Compress-Archive -Path $currentArchive -DestinationPath $currentArchive".zip" -Verbose
 throw "$env:ProgramFiles\7-Zip\7z.exe needed"}
 else{
 set-alias arch "$env:ProgramFiles\7-Zip\7z.exe"
