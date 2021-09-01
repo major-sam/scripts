@@ -83,7 +83,7 @@ Write-PrettyMessage -Message "Run Edit-Configs.ps1" -MessageType "Standart" -Col
 C:\Users\enesudimov\Desktop\Normalize-Stage\Edit-Configs.ps1  # Поменять путь до скрипта
 
 Write-PrettyMessage -Message "Generate and run sql scripts" -MessageType "Standart" -Color Green
-$ScriptsFolder = "\\server\enesudimov\stage\"
+$ScriptsFolder = "\\server\enesudimov\stage\"     # path to sql script from data folder in repo
 $ScriptsFiles = Get-ChildItem -Path "$ScriptsFolder*" -Include *.sql
 $oldIp = '172.16.1.217'
 $oldHostname = 'VM1APKTEST-P1'
