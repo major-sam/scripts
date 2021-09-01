@@ -1,3 +1,7 @@
+Param (
+    [string]$ExportFilesFolderPath                                                                          # Директория с экспортированными данными   
+)
+
 function Set-NewDataScript
 {
     <#
@@ -43,7 +47,7 @@ UPDATE [$DataBaseName].Settings.$TableName SET Value = $OptionValue
     return $Query                                                                                   # < (7)    
 }
 
-$ExportFilesFolderPath = "\\server\enesudimov\stage\data\ExportData"                                # Директория с экспортированными данными
+
 $ExportFilesList = Get-ChildItem -Path $ExportFilesFolderPath\* -Include "*$env:COMPUTERNAME*"      # Список файлов в директории, отфильтрованный по имени машины в названии     
 
 foreach ($file in $ExportFilesList.FullName)
@@ -58,13 +62,13 @@ foreach ($file in $ExportFilesList.FullName)
         $DataBaseName = "UniRu"
         $TableName = "SiteOptions"        
     }
-    $TableContent = Get-Content -Path $file -Encoding UTF8
+    $TableContent = Get-Content -LiteralPath $file -Encoding UTF8
     $Query = Set-NewDataScript -ExportFileContent $TableContent -DataBaseName $DataBaseName -TableName $TableName
 
-    if (!(Test-Path C:\Deploy\SqlScripts\))
+    if (!(Test-Path C:\temp))
     {
-        New-Item -Path C:\Deploy\SqlScripts\ -ItemType Directory -Verbose 
+        New-Item -Path C:\temp -ItemType Directory -Verbose 
     }
 
-    Set-Content -Path "C:\Deploy\SqlScripts\$DataBaseName.sql" -Encoding UTF8 -Value $Query
+    Set-Content -LiteralPath "C:\temp\$DataBaseName.sql" -Encoding UTF8 -Value $Query
 }
