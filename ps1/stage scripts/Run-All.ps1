@@ -80,7 +80,7 @@ Switch-Services -ExpectedState "Stopped" -ServicesList $services
 
 
 Write-PrettyMessage -Message "Run Edit-Configs.ps1" -MessageType "Standart" -Color Green
-C:\Users\enesudimov\Desktop\Normalize-Stage\Edit-Configs.ps1
+C:\Users\enesudimov\Desktop\Normalize-Stage\Edit-Configs.ps1  # Поменять путь до скрипта
 
 Write-PrettyMessage -Message "Generate and run sql scripts" -MessageType "Standart" -Color Green
 $ScriptsFolder = "\\server\enesudimov\stage\"
