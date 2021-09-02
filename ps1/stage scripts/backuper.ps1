@@ -6,7 +6,8 @@
 Список сервисова $bakFolders  лучше использовать в зависимости от окружения, но сейчас добавлен скип для несуществующих папок.В дальнейшем должно переехать в переменную окружения
 #>
 
-$archiveFolder = "c:\Archive"
+$ProgressPreference = 'SilentlyContinue'
+$archiveFolder = "c:\$env:COMPUTERNAME.Archive"
 #папка для архивов.  В дальнейшем надо унести в сеть
 $bakFolders = ("c:\inetpub", "c:\kernel", "c:\kernelweb", "c:\Services")
 #список папок сервисов для бэкапов
@@ -31,6 +32,7 @@ If(!(test-path $currentArchive))
 
 foreach ($folder in $bakFolders ){
     if (test-path $folder){
+        Write-Host -ForegroundColor Green "[INFO] Copy $folder into archive folder..."
         Copy-Item -Path $folder -Destination $currentArchive -Force -Recurse -Verbose
     }
     else{
@@ -74,14 +76,22 @@ CLOSE db_cursor
 DEALLOCATE db_cursor
 "
 
-
+Write-Host -ForegroundColor Green "[INFO] Backup databases..."
 Invoke-Sqlcmd -QueryTimeout $queryTimeout -verbose -ServerInstance $env:COMPUTERNAME -Database "master" -query $backupQuery -ErrorAction Stop
 
+Write-Host -ForegroundColor Green "[INFO] Export data from settings..."
+<#
+.\exportDBData.ps1
 
+Write-Host -ForegroundColor Green "[INFO] Compress archive folder..."
 if (-not (test-path "$env:ProgramFiles\7-Zip\7z.exe")) {
-Compress-Archive -Path $currentArchive -DestinationPath $currentArchive".zip" -Verbose
+Compress-Archive -Path $archiveFolder -DestinationPath "$archiveFolder.zip" -Verbose
 throw "$env:ProgramFiles\7-Zip\7z.exe needed"}
 else{
 set-alias arch "$env:ProgramFiles\7-Zip\7z.exe"
-arch a -tzip $currentArchive   $currentArchive }
-Remove-Item -Force -Recurse $currentArchive 
+arch a -tzip $archiveFolder   $archiveFolder }
+Remove-Item -Force -Recurse $archiveFolder
+
+Write-Host -ForegroundColor Green "[INFO] Copy archive to net folder..."
+Copy-Item -Path "$archiveFolder.zip" -Destination "\\server\enesudimov\stage" -Verbose
+#>
