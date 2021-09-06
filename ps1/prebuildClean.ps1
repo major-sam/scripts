@@ -79,8 +79,6 @@ sslFlags
 	$guid = [guid]::NewGuid().ToString("B")
 	netsh http add sslcert hostnameport="${hostname}:443" certhash=$cert certstorename=MY appid="$guid"
 #>
-
-$ProgressPreference = 'SilentlyContinue'
 ## Disable firewall 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 ## Disable Wdefender
@@ -94,13 +92,13 @@ Install-WindowsFeature -name Web-Server -IncludeManagementTools
 Register-PackageSource -Force -provider NuGet -name nugetRepository -location https://www.nuget.org/api/v2
 Install-Module  -Force -Name IISAdministration 
 
-Import-Module  -Force WebAdministration
+Import-Module -Force WebAdministration
 Remove-Website -Name *
 Remove-WebAppPool -name *
 $username ="GKBALTBET\TestKernel_svc"
 $pass = "GldycLIFKM2018"
 
-$IISPools = @( 
+<# $IISPools = @( 
     @{
         SiteName = 'AdminMessageApp'
         DomainAuth =  @{
@@ -216,9 +214,9 @@ $IISPools = @(
                 @{protocol='https';bindingInformation="*:4449:"}
             )
     }
-)  
+)   #>
 $RuntimeVersion ='v4.0'
-foreach($site in $IISPools ){
+<# foreach($site in $IISPools ){
     $name =  $site.SiteName
     New-Item –Path IIS:\AppPools\$name -force
     Set-ItemProperty –Path IIS:\AppPools\$name -Name managedRuntimeVersion -Value 'v4.0'
@@ -232,11 +230,12 @@ foreach($site in $IISPools ){
     Set-ItemProperty $IISSite -name  Bindings -value $site.Bindings
     Start-WebSite -Name "$name"
 }
-
+ #>
 
 ##mssql
 
 
+$ProgressPreference = 'SilentlyContinue'
 $isoLocation = "\\server\Soft\Microsoft\ISO\SQL 2019 Enterprice\en_sql_server_2019_enterprise_x64_dvd_c7d70add.iso"
 $pathToConfigurationFile = "\\server\tcbuild$\Testers\_VM Update Instructions\Jenkins\mssql19\ConfigurationFile.ini"
 $copyFileLocation = "C:\Temp\ConfigurationFile.ini"
@@ -309,5 +308,6 @@ foreach($i in $items){
 	chocolatey install -y $i
 }
 npm install --global windows-build-tools
+
 
 add-LocalGroupMember -Group "Administrators" -Member "jenkins"
