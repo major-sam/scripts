@@ -91,15 +91,15 @@ function RestoreSqlDb($db_params) {
 			GO
 			"
 		Invoke-Sqlcmd -Verbose -ServerInstance $env:COMPUTERNAME -Query $KillConnectionsSql -ErrorAction continue
+		$dbBackupFile = $release_bak_folder + $db.BackupFile
 		if ($db.ContainsKey('RelocateFiles')){
 			foreach ($dbFile in $db.RelocateFiles) {
 				$RelocateFile += New-Object Microsoft.SqlServer.Management.Smo.RelocateFile($dbFile.SourceName, ("{0}{1}" -f $MSSQLDataPath, $dbFile.FileName))
 			}
-			$dbBackupFile = $release_bak_folder + $db.BackupFile
-			Restore-SqlDatabase -Verbose -ServerInstance $env:COMPUTERNAME -Database $db.DbName -BackupFile  $dbBackupFile -RelocateFile $RelocateFile -ReplaceDatabase
+			Restore-SqlDatabase -Verbose -ServerInstance $env:COMPUTERNAME -Database $db.DbName -BackupFile  $db.BackupFile -RelocateFile $RelocateFile -ReplaceDatabase
 			Push-Location C:\Windows
 		}else{
-			Restore-SqlDatabase -Verbose -ServerInstance $env:COMPUTERNAME -Database $db.DbName -BackupFile  $dbBackupFile -ReplaceDatabase
+			Restore-SqlDatabase -Verbose -ServerInstance $env:COMPUTERNAME -Database $db.DbName -BackupFile  $db.BackupFile -ReplaceDatabase
 			Push-Location C:\Windows			
 		}
 	}

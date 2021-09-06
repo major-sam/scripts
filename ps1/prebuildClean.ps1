@@ -92,6 +92,41 @@ Install-WindowsFeature -name Web-Server -IncludeManagementTools
 Register-PackageSource -Force -provider NuGet -name nugetRepository -location https://www.nuget.org/api/v2
 Install-Module  -Force -Name IISAdministration 
 
+### IIS modules
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServer
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-CommonHttpFeatures
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpErrors
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpRedirect
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ApplicationDevelopment
+
+Enable-WindowsOptionalFeature -online -FeatureName NetFx4Extended-ASPNET45
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-NetFxExtensibility45
+
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HealthAndDiagnostics
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpLogging
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-LoggingLibraries
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-RequestMonitor
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpTracing
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-Security
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-RequestFiltering
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-Performance
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerManagementTools
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-IIS6ManagementCompatibility
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-Metabase
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ManagementConsole
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-BasicAuthentication
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WindowsAuthentication
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-StaticContent
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-DefaultDocument
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebSockets
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ApplicationInit
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIExtensions
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIFilter
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpCompressionStatic
+
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45
+
 Import-Module -Force WebAdministration
 Remove-Website -Name *
 Remove-WebAppPool -name *
@@ -295,7 +330,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 # renew env:PATH
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 $items  = @("notepadplusplus", "googlechrome", "ssms", "git", "nuget.commandline", "dotnet-sdk",
-	"memurai", "rabbitmq", "dotnetcore-3.0-runtime", "dotnet-5.0-aspnetruntime --version=5.0.6",
+	"memurai-developer", "rabbitmq  --version=3.7.17", "dotnetcore-3.0-runtime", "dotnet-5.0-aspnetruntime --version=5.0.6",
 	"dotnet-runtime --version=5.0.6", "dotnetcore-aspnetruntime --version=3.0.3", 
 	"dotnet-5.0-desktopruntime --version=5.0.8", "dotnet-runtime --version=5.0.8", 
 	"dotnetcore-runtime.install --version=3.1.17", "dotnetcore --version=5.0.6", 
@@ -303,7 +338,7 @@ $items  = @("notepadplusplus", "googlechrome", "ssms", "git", "nuget.commandline
 	"visualstudio2019-workload-visualstudioextensionbuildtools", 
 	"visualstudio2019-workload-databuildtools", "visualstudio2019-workload-nodebuildtools", 
 	"visualstudio2019-workload-universalbuildtools", "visualstudio2019-workload-webbuildtools", 
-	"nodejs", "python", "python2")
+	"nodejs", "python", "python2", "webdeploy", "urlrewrite")
 foreach($i in $items){
 	chocolatey install -y $i
 }
@@ -311,3 +346,21 @@ npm install --global windows-build-tools
 
 
 add-LocalGroupMember -Group "Administrators" -Member "jenkins"
+
+
+# Enable FILESTREAM ! SQL 15
+$instance = "MSSQLSERVER"
+$wmi = Get-WmiObject -Namespace "ROOT\Microsoft\SqlServer\ComputerManagement15" -Class FilestreamSettings | where {$_.InstanceName -eq $instance}
+$wmi.EnableFilestream(3, $instance)
+Get-Service -Name $instance | Restart-Service -force
+
+Invoke-Sqlcmd "EXEC sp_configure filestream_access_level, 2"
+Invoke-Sqlcmd "RECONFIGURE"
+
+#rabbitmq Fix
+SET HOMEDRIVE=C:
+Set-Location -Path 'C:\Program Files\RabbitMQ Server\rabbitmq_server-3.7.17\sbin\'
+rabbitmq-plugins.bat enable rabbitmq_management
+rabbitmq-service.bat stop
+rabbitmq-service.bat install
+rabbitmq-service.bat start
