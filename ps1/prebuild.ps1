@@ -127,7 +127,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIExtensions
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIFilter
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpCompressionStatic
 
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45 -all
 
 Import-Module  -Force WebAdministration
 Remove-Website -Name *
@@ -341,7 +341,7 @@ $items  = @("notepadplusplus", "googlechrome", "ssms", "git", "nuget.commandline
 	"visualstudio2019-workload-visualstudioextensionbuildtools", 
 	"visualstudio2019-workload-databuildtools", "visualstudio2019-workload-nodebuildtools", 
 	"visualstudio2019-workload-universalbuildtools", "visualstudio2019-workload-webbuildtools", 
-	"nodejs", "python", "python2", "webdeploy", "urlrewrite")
+	"nodejs", "python", "python2", "webdeploy", "urlrewrite", " dotnet-5.0-windowshosting  -y --force", "dotnetcore-3.0-windowshosting -y --force", "dotnetcore-2.1-windowshosting -y --force")
 foreach($i in $items){
 	chocolatey install -y $i
 npm install --global windows-build-tools

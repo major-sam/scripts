@@ -84,11 +84,11 @@ function RestoreSqlDb($db_params) {
 		$KillConnectionsSql=
 			"
 			USE master
-			GO
-			ALTER DATABASE [$dbname] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
-			GO
-			DROP DATABASE [$dbname]
-			GO
+            IF EXISTS(select * from sys.databases where name='"+$dbname+"')
+            BEGIN
+			    ALTER DATABASE [$dbname] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+			    DROP DATABASE [$dbname]
+			END;
 			"
 		Invoke-Sqlcmd -Verbose -ServerInstance $env:COMPUTERNAME -Query $KillConnectionsSql -ErrorAction continue
 		$dbBackupFile = $release_bak_folder + $db.BackupFile
