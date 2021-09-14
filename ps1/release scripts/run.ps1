@@ -53,7 +53,7 @@ $update_script = "\\server\tcbuild$\Testers\_VM Update Instructions\10.09.2021 R
 
 function Get-VmHostname {
     param (
-        [int16]$MachineNum
+        [string]$MachineNum
     )
 
     $vm_hostname = ""
