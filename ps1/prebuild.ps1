@@ -32,52 +32,6 @@ $IISPools - переменная для создания пулов и сайт�
             )		 протокол^  || порт и hostname ^
     }    
 
-:TODO 
-
-Часть iis скрипта необходимо вынести в деплой приложения
-
-пока не реализованы:
-sslFlags 
-Подстановка сертификатов
-	Вариант с запуском с аргументами и генережкой сертификатов с Microsoft SDK
-	>.\SSLIISBinding.ps1 "test.west-wind.com" "Default Web Site" "LocalMachine" $cert
-	
-	$hostname = "test.west-wind.com"
-	$iisSite = "Default Web Site"
-	$machine = "LocalMachine"
-
-	if ($args[0]) 
-	{     
-		$hostname = $args[0]
-	}
-	if($args[1])
-	{
-		$iisSite = $args[1]
-	}
-	if ($args[2])
-	{
-		$machine = $args[2]
-	}
-	if ($args[3])
-	{
-		$cert = $args[3]
-	}
-	"Host Name: " + $hostname
-	"Site Name: " + $iisSite
-	"  Machine: " + $machine
-	if (-not $cert) {
-		# Create a certificate
-		& "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\x64\makecert" -r -pe -n "CN=${hostname}" -b 06/01/2016 -e 06/01/2020 -eku 1.3.6.1.5.5.7.3.1 -ss my -sr localMachine  -sky exchange  -sp "Microsoft RSA SChannel Cryptographic Provider" -sy 12
-
-		dir cert:\localmachine\my
-		$cert = (Get-ChildItem cert:\LocalMachine\My | where-object { $_.Subject -like "*$hostname*" } | Select-Object -First 1).Thumbprint
-		$cert
-	}
-	"Cert Hash: " + $cert
-
-	# http.sys mapping of ip/hostheader to cert
-	$guid = [guid]::NewGuid().ToString("B")
-	netsh http add sslcert hostnameport="${hostname}:443" certhash=$cert certstorename=MY appid="$guid"
 #>
 
 $ProgressPreference = 'SilentlyContinue'
@@ -340,7 +294,7 @@ $items  = @("notepadplusplus", "googlechrome", "ssms", "git", "nuget.commandline
 	"visualstudio2019buildtools", "visualstudio2019-workload-netcorebuildtools", 
 	"visualstudio2019-workload-visualstudioextensionbuildtools", 
 	"visualstudio2019-workload-databuildtools", "visualstudio2019-workload-nodebuildtools", 
-	"visualstudio2019-workload-universalbuildtools", "visualstudio2019-workload-webbuildtools", 
+	"visualstudio2019-workload-universalbuildtools", "visualstudio2019-workload-webbuildtools", "graphviz",
 	"nodejs", "python", "python2", "webdeploy", "urlrewrite", " dotnet-5.0-windowshosting  -y --force", "dotnetcore-3.0-windowshosting -y --force", "dotnetcore-2.1-windowshosting -y --force")
 foreach($i in $items){
 	chocolatey install -y $i
