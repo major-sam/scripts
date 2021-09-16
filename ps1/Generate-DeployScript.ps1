@@ -1,3 +1,9 @@
+<#
+    Generate-DeployScript
+    Скрипт получает на вход имя сервиса и тип его развертывания (Site или Service).
+    Создает шаблонный скрипт для развертывания какого-либо сервиса по пути C:\Users\$env:USERNAME\Desktop\
+#>
+
 Param (
     [Parameter(Mandatory=$true)]
     [string]$ServiceName,
