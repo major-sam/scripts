@@ -51,30 +51,30 @@ $RemoveOldWebsiteFunctionTemp =
 $SetupNewServiceFunctionTemp = 
 "`t# Функция конфигурирует новый сервис $ServiceName
 `tparam (
-`t    `$ServiceName
-`t    `$ServiceFolderPath
-`t    `$ServiceUserName
+`t    `$ServiceName,
+`t    `$ServiceFolderPath,
+`t    `$ServiceUserName,
 `t    `$ServiceUserPassword
-`t    )
+`t)
 `t`$Credentials = New-Object System.Management.Automation.PSCredential (`$ServiceUserName, `$ServiceUserPassword)
 `tWrite-Host -ForegroundColor Green `"[INFO] Deploy `$ServiceName as a Service`"
 `ttry {& `"`$ServiceFolderPath\`$ServiceName.exe`" install}
 `tcatch {New-Service -Name `$ServiceName -BinaryPathName `"`$ServiceFolderPath\`$ServiceName.exe`"}
-`t`$Service = Get-Service -Name `"`$ServiceName`"
+`t`$Service = Get-Service -Name `"*`$ServiceName*`"
 `tSet-Service -Name `$Service.Name -Credential `$Credentials -StartupType Automatic -Verbose
 `tStart-Service -Name `$Service.Name"
 
 $SetupNewWebSiteFunctionTemp = 
 "`t# Функция конфигурирует новый вебсайт $ServiceName
 `tparam (
-`t    `$ServiceName
-`t    `$ServiceFolderPath
-`t    `$ServiceUserName
-`t    `$ServiceUserPassword
-`t    `$ManagedRuntimeVersion
-`t    `$BindingInformation
+`t    `$ServiceName,
+`t    `$ServiceFolderPath,
+`t    `$ServiceUserName,
+`t    `$ServiceUserPassword,
+`t    `$ManagedRuntimeVersion,
+`t    `$BindingInformation,
 `t    `$CertificateThumbPrint
-`t    )
+`t)
 `tWrite-Host -ForegroundColor Green `"[INFO] Deploy `$ServiceName as an IIS site`"
 `t# Создание App Pool-а сервиса
 `tWrite-Host -ForegroundColor Green `"[INFO] Create pool `$ServiceName...`"
@@ -100,13 +100,13 @@ switch ($ServiceType)
         $RemoveOldServiceFunctionBody = $RemoveOldWebsiteFunctionTemp
         $SetupNewServiceFunctionBody = $SetupNewWebSiteFunctionTemp
         $PreDeploy = $IisModules
-        }
+    }
     "Service" {
         $PathToParentFolder = "C:\Services"
         $RemoveOldServiceFunctionBody = $RemoveOldServiceFunctionTemp
         $SetupNewServiceFunctionBody = $SetupNewServiceFunctionTemp
         $PreDeploy = ""
-        }
+    }
 }
 
 
@@ -154,7 +154,7 @@ switch (`$Environment)
         `$DataSource = `"localhost`"
         `$KernelDBInitialCatalog = `"BaltBetM`"
         `$KernelWebDBInitialCatalog = `"BaltBetWeb`"
-        }
+    }
 }
 
 
