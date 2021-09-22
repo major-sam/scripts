@@ -39,6 +39,10 @@ foreach ($DataBase in $DataBases.Name)
     $qwr = "
     USE [$DataBase]
     GO
+    CREATE USER [$User] FOR LOGIN [$User]
+    GO
+    USE [$DataBase]
+    GO
     ALTER ROLE [$DBRoleMembership] ADD MEMBER [$User]
     GO
     " 
