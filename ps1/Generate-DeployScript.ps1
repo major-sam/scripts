@@ -132,7 +132,7 @@ $RemoveOldServiceFunctionBody
 }
 
 
-function Setup-NewService
+function Deploy-NewService
 {
 $SetupNewServiceFunctionBody    
 }
