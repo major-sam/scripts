@@ -27,7 +27,7 @@ $RemoveOldServiceFunctionTemp =
 "`t# Функция удаляет старую конфигурацию сервиса $ServiceName
 `tparam (`$ServiceName)
 `tWrite-Host -ForegroundColor Green `"[INFO] Remove old `$ServiceName configuration...`"
-`t`$OldServiceNames = (Get-Service -Name *`$ServiceName*).Name
+`t`$OldServiceNames = (Get-Service -Name *`$ServiceName* -ErrorAction SilentlyContinue).Name
 `tforeach (`$OldServiceName in `$OldServiceNames)
 `t{
 `t    Stop-Service -Name `$OldServiceName -Verbose
@@ -58,7 +58,7 @@ $SetupNewServiceFunctionTemp =
 `t)
 `t`$Credentials = New-Object System.Management.Automation.PSCredential (`$ServiceUserName, `$ServiceUserPassword)
 `tWrite-Host -ForegroundColor Green `"[INFO] Deploy `$ServiceName as a Service`"
-`ttry {& `"`$ServiceFolderPath\`$ServiceName.exe`" install}
+`ttry {& `"`$ServiceFolderPath\`$ServiceName.exe`" install;Get-Service -Name `"*`$ServiceName*`"}
 `tcatch {New-Service -Name `$ServiceName -BinaryPathName `"`$ServiceFolderPath\`$ServiceName.exe`"}
 `t`$Service = Get-Service -Name `"*`$ServiceName*`"
 `tSet-Service -Name `$Service.Name -Credential `$Credentials -StartupType Automatic -Verbose
@@ -148,7 +148,7 @@ switch (`$Environment)
     'STAGE' {Write-Host 'Not complited. Run TEST env';exit}
     'TEST' {
         `$ServiceName = `"$ServiceName`"
-        `$ServiceFolderPath = `"$PathToParentFolder\$ServiceName`"
+        `$ServiceFolderPath = `"$PathToParentFolder\`$ServiceName`"
         `$ServiceUserName = `"testkernel_svc@gkbaltbet.local`"
         `$ServiceUserPassword = ConvertTo-SecureString `"GldycLIFKM2018`" -AsPlainText -Force
         `$DataSource = `"localhost`"
