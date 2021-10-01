@@ -54,7 +54,7 @@ $SetupNewServiceFunctionTemp =
 `t    `$ServiceName,
 `t    `$ServiceFolderPath,
 `t    `$ServiceUserName,
-`t    `$ServiceUserPassword
+`t    [securestring]`$ServiceUserPassword
 `t)
 `t`$Credentials = New-Object System.Management.Automation.PSCredential (`$ServiceUserName, `$ServiceUserPassword)
 `tWrite-Host -ForegroundColor Green `"[INFO] Deploy `$ServiceName as a Service`"
@@ -78,6 +78,7 @@ $SetupNewWebSiteFunctionTemp =
 `tWrite-Host -ForegroundColor Green `"[INFO] Deploy `$ServiceName as an IIS site`"
 `t# Создание App Pool-а сервиса
 `tWrite-Host -ForegroundColor Green `"[INFO] Create pool `$ServiceName...`"
+`t`$manager = Get-IISServerManager
 `t`$manager.ApplicationPools.Add(`$ServiceName)
 `t`$manager.ApplicationPools[`$ServiceName].ManagedRuntimeVersion = `$ManagedRuntimeVersion
 `t`$manager.ApplicationPools[`$ServiceName].ProcessModel.IdentityType = `"SpecificUser`"
@@ -116,8 +117,6 @@ $TemplateScriptContent =
     Скрипт для разворота $ServiceName. 
     Получает на вход параметр окружения Environment (строго TEST, STAGE, PROD).
     В зависимости от параметра окружения проставляет необходимые переменные для настройки сервиса
-
-    Скрипт работает в Powershell v.7.
 #>
 Param (
     [Parameter(Mandatory=`$true)]
@@ -136,9 +135,6 @@ function Deploy-NewService
 {
 $SetupNewServiceFunctionBody    
 }
-
-
-if (`$PSVersionTable.PSVersion.Major -lt 6) {Write-Host -ForegroundColor Red `"[ERROR] Current PS Version less then 6. Abort script...`";exit}
 
 
 # Определение переменных в зависимости от выбранного окружения
@@ -175,7 +171,7 @@ Write-Host -ForegroundColor Green `"[INFO] Edit $ServiceName configuration files
 
 
 # Настройка сервиса
-Setup-NewService -ServiceName `$ServiceName -ServiceFolderPath `$ServiceFolderPath -ServiceUserName `$ServiceUserName -ServiceUserPassword `$ServiceUserPassword # <-- указать праметры функции -->
+Deploy-NewService -ServiceName `$ServiceName -ServiceFolderPath `$ServiceFolderPath -ServiceUserName `$ServiceUserName -ServiceUserPassword `$ServiceUserPassword # <-- указать праметры функции -->
 # 
 "
 
