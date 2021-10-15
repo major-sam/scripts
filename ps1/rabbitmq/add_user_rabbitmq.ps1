@@ -1,13 +1,63 @@
 # Добавление пользователя в RabbitMQ и назначение ему прав
 
-# Устанавливаем curl если необходимо
-# Write-Host -ForegroundColor Green "[INFO] Installing curl"
-#choco install curl -y
+############ Параметры для правки (начало) ############
+# IP или hostname
+$hostname = "localhost"
+# Учетная запись пользователя rabbit с правами администратора
+$rabbit_admin_user = "guest"
+$rabbit_admin_pass = "guest"
 
-# Добавляем пользователя test
-Write-Host -ForegroundColor Green "[INFO] Create user "test""
-curl.exe -i -u guest:guest -H "content-type:application/json" -X PUT http://localhost:15672/api/users/test -d"{'password':'test','tags':'administrator'}"
+# Креды нового пользователя
+$new_user = "yudins"
 
-# Добавдляем права администратора для пользователя test
-Write-Host -ForegroundColor Green "[INFO] Set permissions to user "test""
-curl.exe -i -u guest:guest -H "content-type:application/json" -X PUT http://localhost:15672/api/permissions/%2f/test -d"{'configure':'.*','write':'.*','read':'.*'}"
+$user_cred = @{
+    password = $new_user
+    tags = 'administrator'
+}
+
+# Права пользователя
+$user_permissions = @{
+    configure = '.*'
+    write = '.*'
+    read = '.*'
+}
+############ Параметры для правки (конец) ############
+
+
+$user_cred = (($user_cred | ConvertTo-Json) -replace '"', '\"')
+$user_permissions = (($user_permissions | ConvertTo-Json) -replace '"', '\"')
+
+# Запрашиваем инфо о пользователе
+Write-Host -ForegroundColor Green "[INFO] Get info about user '$new_user'"
+$resp_get_user = curl.exe -i -u $rabbit_admin_user`:$rabbit_admin_pass -H "content-type:application/json" -X GET http://"$hostname":15672/api/users/$new_user -silent
+if ($resp_get_user[0] -eq "HTTP/1.1 200 OK") {
+    Write-Host "[INFO] User '$new_user' exists" -ForegroundColor Green
+} else {
+    Write-Host "[INFO] User '$new_user' doesn't exist [" $resp_get_user[0] $resp_get_user[-1] "]" -ForegroundColor Yellow
+}
+
+Start-Sleep 1
+
+# Добавляем пользователя
+Write-Host -ForegroundColor Green "[INFO] Create user '$new_user'"
+$resp_add_user = curl.exe -i -u $rabbit_admin_user`:$rabbit_admin_pass -H "content-type:application/json" -X PUT http://"$hostname":15672/api/users/$new_user -d $user_cred -silent
+if ($resp_add_user[0] -eq "HTTP/1.1 204 No Content") {
+    Write-Host "[INFO] User '$new_user' already exists" -ForegroundColor Yellow
+} elseif ($resp_add_user[0] -eq "HTTP/1.1 201 Created") {
+    Write-Host "[INFO] User '$new_user' created" -ForegroundColor Green
+} else {
+    Write-Host "[WARN] Something goes wrong [" $resp_add_user[0] "]" -ForegroundColor Red
+}
+
+Start-Sleep 1
+
+# Добавляем права пользователю
+Write-Host -ForegroundColor Green "[INFO] Set permissions to user '$new_user'"
+$resp_perm = curl.exe -i -u $rabbit_admin_user`:$rabbit_admin_pass -H "content-type:application/json" -X PUT http://"$hostname":15672/api/permissions/%2f/$new_user -d $user_permissions -silent
+if ($resp_perm[0] -eq "HTTP/1.1 201 Created") {
+    Write-Host "[INFO] Permissions added to user '$new_user'" -ForegroundColor Green
+} elseif ($resp_perm[0] -eq "HTTP/1.1 204 No Content") {
+    Write-Host "[INFO] User '$new_user' already have permissions" -ForegroundColor Yellow
+} else {
+    Write-Host "[WARN] Something goes wrong [" $resp_perm[0] "]" -ForegroundColor Red
+}
