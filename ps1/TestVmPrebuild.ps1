@@ -1,37 +1,14 @@
 ﻿<#
 Билд для сборки окружения под проекты
 
-
-
 prerequsites:
   	Базовые
 	!AD domain
 	!Set AD users\groups
 	!PS 5
-	
-	
-	Дженкинс
 	!jenkins node registration
 	
 	
-	
-	
-	
-
-
-$IISPools - переменная для создания пулов и сайтов в иис - лист хэштаблиц
-    @{
-        SiteName = 'AdminMessageApp'  --- ИМЯ САЙТА и ПУЛА
-        DomainAuth =  @{ - БЛОК АВТОРИЗАЦИИ ДЛЯ ПУЛА И САЙТА
-            userName="$username";password="$pass";identitytype=3
-            }
-        Bindings= @( -ЛИСТ ДЛЯ Bindings САЙТА.
-                @{protocol='https';bindingInformation="*:44307:"}				
-                @{protocol='http';bindingInformation="*:8007:"}
-                @{protocol='https';bindingInformation="*:13443:vm4apktest-p3.gkbaltbet.local"}
-            )		 протокол^  || порт и hostname ^
-    }    
-
 #>
 $ProgressPreference = 'SilentlyContinue'
 ## Disable firewall 
@@ -91,28 +68,18 @@ $pass = "GldycLIFKM2018"
 $RuntimeVersion ='v4.0'
 
 $ProgressPreference = 'SilentlyContinue'
-$pathToConfigurationFile = "\\server\tcbuild$\Testers\_VM Update Instructions\Jenkins\mssql19\ConfigurationFile.ini"
-
-
-<# 
 $isoLocation = "\\server\Soft\Microsoft\ISO\SQL 2019 Enterprice\en_sql_server_2019_enterprise_x64_dvd_c7d70add.iso"
+$pathToConfigurationFile = "\\server\tcbuild$\Testers\_VM Update Instructions\Jenkins\mssql19\ConfigurationFile.ini"
 $copyFileLocation = "C:\Temp\ConfigurationFile.ini"
 $errorOutputFile = "C:\Temp\ErrorOutput.txt"
 $standardOutputFile = "C:\Temp\StandardOutput.txt"
+
 Write-Host "Copying the ini file."
 
 New-Item "C:\Temp" -ItemType "Directory" -Force
 Remove-Item $errorOutputFile -Force
 Remove-Item $standardOutputFile -Force
 Copy-Item $pathToConfigurationFile $copyFileLocation -Force
-# legacy mssql server statement
-#$user = "$env:UserDomain\$env:USERNAME"
-
-#write-host $user
-##
-#Write-Host "Replacing the placeholder user name with your username"
-#$replaceText = (Get-Content -path $copyFileLocation -Raw) -replace "##MyUser##", $user
-#Set-Content $copyFileLocation $replaceText
 
 Write-Host "Mounting SQL Server Image"
 $drive = Mount-DiskImage -ImagePath $isoLocation
@@ -129,6 +96,7 @@ if ($driveLetter)
  Write-Host "Starting the install of SQL Server"
 Start-Process $driveLetter\Setup.exe "/ConfigurationFile=$copyFileLocation  /IAcceptSQLServerLicenseTerms" -Wait -RedirectStandardOutput $standardOutputFile -RedirectStandardError $errorOutputFile
 }
+
 $standardOutput = Get-Content $standardOutputFile -Delimiter "\r\n"
 
 Write-Host $standardOutput
@@ -143,35 +111,27 @@ Dismount-DiskImage -InputObject $drive
 
 Remove-Item "c:\temp" -Recurse -force
 
- #>
-
 #CHOCOLATEY install
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 # renew env:PATH
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
-$ENV:HOMEDRIVE='C:'
 $items  = @(
 	("notepadplusplus"), ("googlechrome"), ("ssms"), ("git"), ("nuget.commandline"), ("dotnet-sdk"), ("7zip", ""),('powershell-core', ""), 
-	("memurai-developer", ""), ("openjdk11", '--params=`"installdir=\java11`"'),
+	("memurai-developer", ""), ("jdk11", '--params=`"installdir=\java11`"'),
 	("rabbitmq",  "--force --version=3.7.17"), ("dotnetcore-3.0-runtime"), ("dotnet-5.0-aspnetruntime", "--version=5.0.6"),
 	("dotnet-runtime", "--version=5.0.6"), ("dotnetcore-aspnetruntime", "--version=3.0.3"), ('dotnet-sdk', '--pre'),
 	("dotnet-5.0-desktopruntime", "--version=5.0.8"), ("dotnet-runtime", "--version=5.0.8"), 
-	("dotnetcore-runtime.install", "--version=3.1.17"), ("dotnetcore", "--version=5.0.6"), 	
-	("visualstudio2019buildtools", ''), ("visualstudio2019-workload-netcorebuildtools", ''), 
-	("visualstudio2019-workload-visualstudioextensionbuildtools", ''), 
-	("visualstudio2019-workload-databuildtools", ''), ("visualstudio2019-workload-nodebuildtools", ''), 
-	("visualstudio2019-workload-universalbuildtools", ''), 
-	("visualstudio2019-workload-webbuildtools", ''), 
-	("graphviz", ''), 
+	("dotnetcore-runtime.install", "--version=3.1.17"), ("dotnetcore", "--version=5.0.6"), 	("graphviz", ''), 
 	("nodejs", ''), ("python", ''), ("python2", ''), ("webdeploy", ''), ("urlrewrite", ''),
 	("dotnet-5.0-windowshosting", ""), ("dotnetcore-3.0-windowshosting", ''), ("dotnetcore-2.1-windowshosting", '')
 )
 foreach($i in $items){
-	chocolatey install -y  $i
+	write-host -ForegroundColor BLACK -BackgroundColor GRAY $i
+	chocolatey install -y $i
 }
-npm install --global windows-build-tools
 
-
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+& $profile   
 add-LocalGroupMember -Group "Administrators" -Member "jenkins"
 
 
