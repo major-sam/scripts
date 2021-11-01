@@ -111,30 +111,6 @@ Dismount-DiskImage -InputObject $drive
 
 Remove-Item "c:\temp" -Recurse -force
 
-#CHOCOLATEY install
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-# renew env:PATH
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
-$items  = @(
-	("notepadplusplus"), ("googlechrome"), ("ssms"), ("git"), ("nuget.commandline"), ("dotnet-sdk"), ("7zip", ""),('powershell-core', ""), 
-	("memurai-developer", ""), ("jdk11", '--params=`"installdir=\java11`"'),
-	("rabbitmq",  "--force --version=3.7.17"), ("dotnetcore-3.0-runtime"), ("dotnet-5.0-aspnetruntime", "--version=5.0.6"),
-	("dotnet-runtime", "--version=5.0.6"), ("dotnetcore-aspnetruntime", "--version=3.0.3"), ('dotnet-sdk', '--pre'),
-	("dotnet-5.0-desktopruntime", "--version=5.0.8"), ("dotnet-runtime", "--version=5.0.8"), 
-	("dotnetcore-runtime.install", "--version=3.1.17"), ("dotnetcore", "--version=5.0.6"), 	("graphviz", ''), 
-	("nodejs", ''), ("python", ''), ("python2", ''), ("webdeploy", ''), ("urlrewrite", ''),
-	("dotnet-5.0-windowshosting", ""), ("dotnetcore-3.0-windowshosting", ''), ("dotnetcore-2.1-windowshosting", '')
-)
-foreach($i in $items){
-	write-host -ForegroundColor BLACK -BackgroundColor GRAY $i
-	chocolatey install -y $i
-}
-
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
-& $profile   
-add-LocalGroupMember -Group "Administrators" -Member "jenkins"
-
-
 # Enable FILESTREAM ! SQL 15
 $instance = "MSSQLSERVER"
 $wmi = Get-WmiObject -Namespace "ROOT\Microsoft\SqlServer\ComputerManagement15" -Class FilestreamSettings | where {$_.InstanceName -eq $instance}
@@ -144,10 +120,31 @@ Get-Service -Name $instance | Restart-Service -force
 Invoke-Sqlcmd "EXEC sp_configure filestream_access_level, 2"
 Invoke-Sqlcmd "RECONFIGURE"
 
-#rabbitmq Fix
-SET HOMEDRIVE=C:
-Set-Location -Path 'C:\Program Files\RabbitMQ Server\rabbitmq_server-3.7.17\sbin\'
-rabbitmq-plugins.bat enable rabbitmq_management
-rabbitmq-service.bat stop
-rabbitmq-service.bat install
-rabbitmq-service.bat start
+
+##################
+
+#CHOCOLATEY install
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+# renew env:PATH
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+$items  = @(
+	("notepadplusplus", ""), ("googlechrome", ""), ("sql-server-management-studio", ""), ("git", ""), ("nuget.commandline", ""), ("dotnet-sdk", ""), ("7zip", ""),('powershell-core', ""), 
+	("memurai-developer", ""), ("jdk11", '--params=`"installdir=\java11`"'),
+	("rabbitmq",  "--force --version=3.7.17"), ("dotnetcore-3.0-runtime"), ("dotnet-5.0-aspnetruntime", "--version=5.0.6"),
+	("dotnet-runtime", "--version=5.0.6"), ("dotnetcore-aspnetruntime", "--version=3.0.3"), ('dotnet-sdk', '--pre'),
+	("dotnet-5.0-desktopruntime", "--version=5.0.8"), ("dotnet-runtime", "--version=5.0.8"), 
+	("dotnetcore-runtime.install", "--version=3.1.17"), ("dotnetcore", "--version=5.0.6"), 	("graphviz", ''), 
+	("nodejs", ''), ("python", ''), ("python2", ''), ("webdeploy", ''), ("urlrewrite", ''),
+	("dotnet-5.0-windowshosting", ""), ("dotnetcore-3.0-windowshosting", ''), ("dotnetcore-2.1-windowshosting", '')
+)
+$count = 0
+foreach($i in $items){
+    $count ++ 
+	$env:HOMEDRIVE = 'C:'
+	write-host -ForegroundColor BLACK -BackgroundColor GRAY "$i total $count of $($items.Length)"
+	chocolatey instal
+
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+& $profile   
+add-LocalGroupMember -Group "Administrators" -Member "jenkins"
+

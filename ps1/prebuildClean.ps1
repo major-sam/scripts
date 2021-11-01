@@ -14,24 +14,6 @@ prerequsites:
 	!jenkins node registration
 	
 	
-	
-	
-	
-
-
-$IISPools - переменная для создания пулов и сайтов в иис - лист хэштаблиц
-    @{
-        SiteName = 'AdminMessageApp'  --- ИМЯ САЙТА и ПУЛА
-        DomainAuth =  @{ - БЛОК АВТОРИЗАЦИИ ДЛЯ ПУЛА И САЙТА
-            userName="$username";password="$pass";identitytype=3
-            }
-        Bindings= @( -ЛИСТ ДЛЯ Bindings САЙТА.
-                @{protocol='https';bindingInformation="*:44307:"}				
-                @{protocol='http';bindingInformation="*:8007:"}
-                @{protocol='https';bindingInformation="*:13443:vm4apktest-p3.gkbaltbet.local"}
-            )		 протокол^  || порт и hostname ^
-    }    
-
 #>
 $ProgressPreference = 'SilentlyContinue'
 ## Disable firewall 
@@ -85,16 +67,12 @@ Enable-WindowsOptionalFeature -NoRestart -Online -FeatureName IIS-ASPNET45 -all
 Import-Module -Force WebAdministration
 Remove-Website -Name *
 Remove-WebAppPool -name *
-$username ="GKBALTBET\TestKernel_svc"
-$pass = "GldycLIFKM2018"
-
 $RuntimeVersion ='v4.0'
 
 $ProgressPreference = 'SilentlyContinue'
 $pathToConfigurationFile = "\\server\tcbuild$\Testers\_VM Update Instructions\Jenkins\mssql19\ConfigurationFile.ini"
 
-
-<# 
+ 
 $isoLocation = "\\server\Soft\Microsoft\ISO\SQL 2019 Enterprice\en_sql_server_2019_enterprise_x64_dvd_c7d70add.iso"
 $copyFileLocation = "C:\Temp\ConfigurationFile.ini"
 $errorOutputFile = "C:\Temp\ErrorOutput.txt"
@@ -143,7 +121,6 @@ Dismount-DiskImage -InputObject $drive
 
 Remove-Item "c:\temp" -Recurse -force
 
- #>
 
 #CHOCOLATEY install
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
