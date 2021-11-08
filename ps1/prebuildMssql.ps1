@@ -54,7 +54,7 @@ Dismount-DiskImage -InputObject $drive
 
 Remove-Item "c:\temp" -Recurse -force
 
-
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 # Enable FILESTREAM ! SQL 15
 $instance = "MSSQLSERVER"
 $wmi = Get-WmiObject -Namespace "ROOT\Microsoft\SqlServer\ComputerManagement15" -Class FilestreamSettings | where {$_.InstanceName -eq $instance}

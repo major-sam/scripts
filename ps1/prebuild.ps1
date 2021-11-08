@@ -314,10 +314,10 @@ Invoke-Sqlcmd "EXEC sp_configure filestream_access_level, 2"
 Invoke-Sqlcmd "RECONFIGURE"
 
 
- #rabbitmq Fix
+ <#rabbitmq Fix
 SET HOMEDRIVE=C:
 Set-Location -Path 'C:\Program Files\RabbitMQ Server\rabbitmq_server-3.7.17\sbin\'
 rabbitmq-plugins.bat enable rabbitmq_management
 rabbitmq-service.bat stop
 rabbitmq-service.bat install
-rabbitmq-service.bat start 
+rabbitmq-service.bat start #>

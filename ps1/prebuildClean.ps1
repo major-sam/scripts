@@ -77,7 +77,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 $items  = @(
 	("notepadplusplus"), ("googlechrome"), ("ssms"), ("git"), ("nuget.commandline"), ("dotnet-sdk"), ("7zip", ""),('powershell-core', ""), 
-	("memurai-developer", ""), ("openjdk11", '--params=`"installdir=\java11`"'),
+	("memurai-developer", ""), ("openjdk11", ' --version=11.0.12.7'),
 	("rabbitmq",  "--force --version=3.7.17"), ("dotnetcore-3.0-runtime"), ("dotnet-5.0-aspnetruntime", "--version=5.0.6"),
 	("dotnet-runtime", "--version=5.0.6"), ("dotnetcore-aspnetruntime", "--version=3.0.3"), ('dotnet-sdk', '--pre'),
 	("dotnet-5.0-desktopruntime", "--version=5.0.8"), ("dotnet-runtime", "--version=5.0.8"), 
@@ -99,7 +99,6 @@ npm install --global windows-build-tools
 
 
 add-LocalGroupMember -Group "Administrators" -Member "jenkins"
-
 
 <# 
 
